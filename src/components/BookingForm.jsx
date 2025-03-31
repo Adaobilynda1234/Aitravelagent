@@ -1,95 +1,148 @@
-// components/BookingForm.jsx
-import React, { useState } from 'react';
+// src/components/BookingForm.jsx
+import React, { useState } from "react";
 
-function BookingForm({ onPlanTrip }) {
-  const [travelers, setTravelers] = useState(1);
-  const [fromCity, setFromCity] = useState('New York City');
-  const [toCity, setToCity] = useState('Paris');
-  const [fromDate, setFromDate] = useState('2023-11-24');
-  const [toDate, setToDate] = useState('2023-12-05');
-  const [budget, setBudget] = useState(5000);
+const BookingForm = ({ onSubmit }) => {
+  const [formData, setFormData] = useState({
+    travelers: 1,
+    flyingFrom: "New York City",
+    flyingTo: "Paris",
+    fromDate: "2023-11-24",
+    toDate: "2023-12-05",
+    budget: 5000,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onPlanTrip({
-      travelers,
-      fromCity,
-      toCity,
-      fromDate,
-      toDate,
-      budget
-    });
+    onSubmit(formData);
+  };
+
+  const incrementTravelers = () => {
+    setFormData((prev) => ({ ...prev, travelers: prev.travelers + 1 }));
+  };
+
+  const decrementTravelers = () => {
+    if (formData.travelers > 1) {
+      setFormData((prev) => ({ ...prev, travelers: prev.travelers - 1 }));
+    }
   };
 
   return (
-    <div className="w-full max-w-md">
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 space-y-4">
-        <div className="flex items-center justify-center space-x-4">
-          <button 
-            type="button" 
-            onClick={() => setTravelers(Math.max(1, travelers - 1))}
-            className="bg-gray-200 px-3 py-1 rounded"
+    <div className="p-6">
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Number of travellers
+            </label>
+            <div className="flex items-center border rounded-full overflow-hidden">
+              <button
+                type="button"
+                onClick={decrementTravelers}
+                className="p-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center mx-2"
+              >
+                -
+              </button>
+              <span className="flex-1 text-center">{formData.travelers}</span>
+              <button
+                type="button"
+                onClick={incrementTravelers}
+                className="p-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center mx-2"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Flying from
+            </label>
+            <input
+              type="text"
+              name="flyingFrom"
+              value={formData.flyingFrom}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-full"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Flying to
+            </label>
+            <input
+              type="text"
+              name="flyingTo"
+              value={formData.flyingTo}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-full"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              From Date
+            </label>
+            <input
+              type="date"
+              name="fromDate"
+              value={formData.fromDate}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-full"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              To Date
+            </label>
+            <input
+              type="date"
+              name="toDate"
+              value={formData.toDate}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-full"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Budget
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                $
+              </span>
+              <input
+                type="number"
+                name="budget"
+                value={formData.budget}
+                onChange={handleChange}
+                className="w-full pl-8 pr-4 py-2 border rounded-full"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-emerald-400 hover:bg-emerald-500 text-black py-3 px-6 rounded-full text-lg font-medium transition-colors"
           >
-            -
-          </button>
-          <span>{travelers} Traveler{travelers !== 1 ? 's' : ''}</span>
-          <button 
-            type="button" 
-            onClick={() => setTravelers(travelers + 1)}
-            className="bg-gray-200 px-3 py-1 rounded"
-          >
-            +
+            Plan my Trip!
           </button>
         </div>
-
-        <input 
-          type="text" 
-          value={fromCity}
-          onChange={(e) => setFromCity(e.target.value)}
-          placeholder="Flying from"
-          className="w-full px-4 py-2 border rounded"
-        />
-
-        <input 
-          type="text" 
-          value={toCity}
-          onChange={(e) => setToCity(e.target.value)}
-          placeholder="Flying to"
-          className="w-full px-4 py-2 border rounded"
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <input 
-            type="date" 
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
-          />
-          <input 
-            type="date" 
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
-          />
-        </div>
-
-        <input 
-          type="number" 
-          value={budget}
-          onChange={(e) => setBudget(e.target.value)}
-          placeholder="Budget"
-          className="w-full px-4 py-2 border rounded"
-        />
-
-        <button 
-          type="submit"
-          className="w-full bg-green-500 text-white py-3 rounded-full hover:bg-green-600 transition"
-        >
-          Plan my Trip!
-        </button>
       </form>
     </div>
   );
-}
+};
 
 export default BookingForm;

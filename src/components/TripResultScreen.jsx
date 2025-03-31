@@ -1,76 +1,84 @@
-// components/TripResultScreen.jsx
-import React, { useState, useEffect } from 'react';
-import { getOpenAITripSuggestion } from '../services/openaiService';
-import { getWeatherForecast } from '../services/weatherService';
+// src/components/TripResult.jsx
+import React from "react";
 
-function TripResultScreen({ tripDetails }) {
-  const [tripSuggestion, setTripSuggestion] = useState(null);
-  const [weatherForecast, setWeatherForecast] = useState(null);
+const TripResult = ({ tripDetails, onBookFlight, onBookHotel }) => {
+  const { dates, route, weather, flight, hotel } = tripDetails;
 
-  useEffect(() => {
-    const fetchTripDetails = async () => {
-      try {
-        // Fetch OpenAI trip suggestion
-        const aiSuggestion = await getOpenAITripSuggestion(tripDetails);
-        setTripSuggestion(aiSuggestion);
+  // Format dates for display
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.getDate()}th ${
+      [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ][date.getMonth()]
+    } ${String(date.getFullYear()).slice(2)}`;
+  };
 
-        // Fetch weather forecast
-        const weather = await getWeatherForecast(tripDetails.toCity, tripDetails.fromDate);
-        setWeatherForecast(weather);
-      } catch (error) {
-        console.error('Error fetching trip details:', error);
-      }
-    };
-
-    fetchTripDetails();
-  }, [tripDetails]);
+  const startDateFormatted = formatDate(dates.start);
+  const endDateFormatted = formatDate(dates.end);
 
   return (
-    <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6 space-y-4">
-      <div className="flex justify-between text-sm text-gray-500">
-        <span>{tripDetails.fromDate}</span>
-        <span>{tripDetails.toDate}</span>
-      </div>
-      <div className="text-center">
-        <h2 className="text-xl font-bold">{tripDetails.fromCity} → {tripDetails.toCity}</h2>
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold text-center mb-4">Your Trip</h1>
+
+      <div className="flex justify-between items-center">
+        <div className="bg-emerald-100 py-2 px-4 rounded-full text-sm flex items-center">
+          <span className="mr-1">→</span> {startDateFormatted}
+        </div>
+        <div className="bg-emerald-100 py-2 px-4 rounded-full text-sm flex items-center">
+          {endDateFormatted} <span className="ml-1">←</span>
+        </div>
       </div>
 
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <h3 className="font-semibold mb-2">Weather</h3>
-        {weatherForecast ? (
-          <p>
-            You can expect the weather to be {weatherForecast.description}, 
-            Low {weatherForecast.tempMin}°, High {weatherForecast.tempMax}°
-          </p>
-        ) : (
-          <p>Loading weather information...</p>
-        )}
+      <div className="bg-emerald-100 py-2 px-4 rounded-full text-center">
+        {route}
       </div>
 
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <span>Flights</span>
-          <button className="bg-green-500 text-white px-4 py-2 rounded-full">
-            Book with Delta
-          </button>
+        <h2 className="font-semibold">Weather</h2>
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p>{weather.description}</p>
         </div>
+      </div>
 
-        <div className="flex justify-between items-center">
-          <span>Hotel</span>
-          <button className="bg-green-500 text-white px-4 py-2 rounded-full">
-            Book Premiere Hotel
+      <div className="space-y-2">
+        <h2 className="font-semibold">Flights</h2>
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p>{flight.recommendation}</p>
+          <button
+            onClick={onBookFlight}
+            className="mt-3 w-full bg-emerald-400 hover:bg-emerald-500 text-black py-2 px-4 rounded-lg text-lg font-medium transition-colors"
+          >
+            Book
           </button>
         </div>
       </div>
 
-      {tripSuggestion && (
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="font-semibold mb-2">AI Trip Suggestion</h3>
-          <p>{tripSuggestion}</p>
+      <div className="space-y-2">
+        <h2 className="font-semibold">Hotel</h2>
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p>{hotel.recommendation}</p>
+          <button
+            onClick={onBookHotel}
+            className="mt-3 w-full bg-emerald-400 hover:bg-emerald-500 text-black py-2 px-4 rounded-lg text-lg font-medium transition-colors"
+          >
+            Book
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
-}
+};
 
-export default TripResultScreen;
+export default TripResult;
